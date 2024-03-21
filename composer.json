@@ -1,0 +1,34 @@
+{
+    "name": "lara-igniter/medialibrary",
+    "description": "Minimal Laraigniter media library to upload files",
+    "keywords": ["laraigniter", "media-library"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/lara-igniter/medialibrary/issues",
+        "source": "https://github.com/lara-igniter/medialibrary"
+    },
+    "authors": [
+        {
+            "name": "George Tsachrelias",
+            "email": "george@laraigniter.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "ext-json": "*",
+        "intervention/image": "^2.7",
+        "lara-elegant/collections": "^1.2",
+        "lara-elegant/fundation": "^1.5",
+        "lara-elegant/support": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laraigniter\\MediaLibrary\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
