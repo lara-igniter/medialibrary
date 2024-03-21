@@ -12,7 +12,7 @@ abstract class BaseType
     /**
      * @var \MY_Input
      */
-    protected MY_Input $request;
+    protected \MY_Input $request;
 
     /**
      * @var string
@@ -55,7 +55,7 @@ abstract class BaseType
      * @param $oldFilePath
      * @param string $type
      */
-    public function __construct(MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type)
+    public function __construct(\MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type)
     {
         $this->request = $request;
         $this->field = $field;

@@ -18,7 +18,7 @@ class Uploader
      * @return \Elegant\Support\Collection
      */
 
-    public static function upload(MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type): Collection
+    public static function upload(\MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type): Collection
     {
         switch ($type) {
             /********** FILE TYPE **********/
