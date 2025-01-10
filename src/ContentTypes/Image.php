@@ -18,7 +18,7 @@ class Image extends BaseType
 
         $resize_quality = !empty(config('media.settings.quality')) ? config('media.settings.quality') : '75%';
 
-        $path = $this->slug . DIRECTORY_SEPARATOR . date('FY') . DIRECTORY_SEPARATOR;
+        $path = $this->slug . DIRECTORY_SEPARATOR . date('F') . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR;
 
         $filename = $this->generateFileName($file, $path);
 

@@ -13,7 +13,7 @@ class File extends BaseType
     {
         $file = $this->request->file($this->field);
 
-        $path = $this->slug . DIRECTORY_SEPARATOR . date('FY') . DIRECTORY_SEPARATOR;
+        $path = $this->slug . DIRECTORY_SEPARATOR . date('F') . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR;
 
         $filename = $this->generateFileName($file, $path);
 
