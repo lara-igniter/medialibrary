@@ -10,42 +10,37 @@ use Intervention\Image\ImageManager;
 class Image extends BaseType
 {
     /**
-     * @return Collection
+     * @return \Elegant\Support\Collection
      */
     public function handle(): Collection
     {
-        $file = $this->request->file($this->field);
+        $path = $this->slug . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('n') . DIRECTORY_SEPARATOR;
 
         $resize_quality = !empty(config('media.settings.quality')) ? config('media.settings.quality') : '75%';
 
-        $path = $this->slug . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('n') . DIRECTORY_SEPARATOR;
+        if(!is_null($this->oldFilePath)) {
+            $this->deleteOldFile($this->oldFilePath);
+        }
 
-        $filename = $this->generateFileName($file, $path);
+        $filename = $this->generateFileName($this->file, $path);
 
-        $this->config = array_merge($this->config, [
-            'file_name' => $filename,
-            'quality' => $resize_quality,
-            'upload_path' => storage_path('app/public/') . $path,
-        ]);
+        $stored = Storage::disk(config('media.storage.disk'))->put(
+            $path . $filename . '.' . $this->file->getClientOriginalExtension(),
+            $this->file->getContent(),
+        );
 
-        app('load')->library('upload', $this->config);
+        $data = new Collection();
 
-        $this->deleteOldFile($this->oldFilePath);
-
-        $data = collect();
-
-        if (app('upload')->do_upload($this->field)) {
-            $uploadData = app('upload')->data();
-
-            $fullPath = $path . $filename . '.' . $file->getClientOriginalExtension();
+        if ($stored) {
+            $fullPath = $path . $filename . '.' . $this->file->getClientOriginalExtension();
 
             $manager = new ImageManager(['driver' => config('media.settings.library')]);
 
             $image = $manager->make(storage_path('app/public/' . $fullPath))->orientate();
 
-            $data = collect([
+            $data->push([
                 'file_path' => $fullPath,
-                'file_name' => $file->getClientOriginalName(),
+                'file_name' => $this->file->getClientOriginalName(),
                 'file_type' => $this->type,
                 'file_extension' => $image->extension,
                 'file_size' => $image->filesize(),
@@ -64,8 +59,8 @@ class Image extends BaseType
                     $resize_height = config('media.settings.resize.height');
                 }
             } else {
-                $resize_width = $uploadData['image_width'];
-                $resize_height = $uploadData['image_height'];
+                $resize_width = $image->width();
+                $resize_height = $image->height();
             }
 
             $image = $image->resize(

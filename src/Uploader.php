@@ -2,6 +2,7 @@
 
 namespace Laraigniter\MediaLibrary;
 
+use Elegant\Foundation\Http\File\UploadedFile;
 use Elegant\Support\Collection;
 use Laraigniter\MediaLibrary\ContentTypes\File;
 use Laraigniter\MediaLibrary\ContentTypes\Image;
@@ -9,27 +10,31 @@ use Laraigniter\MediaLibrary\ContentTypes\Image;
 class Uploader
 {
     /**
-     * @param \MY_Input $request
-     * @param string $field
+     * @param \Elegant\Foundation\Http\File\UploadedFile $file
      * @param string $slug
-     * @param array $row
      * @param $oldFilePath
      * @param string $type
+     *
      * @return \Elegant\Support\Collection
      */
 
-    public static function upload(\MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type): Collection
+    public static function upload(
+        UploadedFile $file,
+        string $slug,
+        $oldFilePath,
+        string $type
+    ): Collection
     {
         switch ($type) {
             /********** FILE TYPE **********/
             case 'file':
-                return (new File($request, $field, $slug, $row, $oldFilePath, $type))->handle();
+                return (new File($file, $slug, $oldFilePath, $type))->handle();
             /********** IMAGE TYPE **********/
             case 'image':
-                return (new Image($request, $field, $slug, $row, $oldFilePath, $type))->handle();
+                return (new Image($file, $slug, $oldFilePath, $type))->handle();
             /********** DEFAULT TYPE **********/
             default:
-                return (new Image($request, $field, $slug, $row, $oldFilePath, 'image'))->handle();
+                return (new Image($file, $slug, $oldFilePath, 'image'))->handle();
         }
     }
 }

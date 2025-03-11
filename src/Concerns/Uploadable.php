@@ -2,6 +2,7 @@
 
 namespace Laraigniter\MediaLibrary\Concerns;
 
+use Elegant\Foundation\Http\File\UploadedFile;
 use Elegant\Support\Collection;
 use Elegant\Support\Facades\Storage;
 use Elegant\Support\Str;
@@ -12,25 +13,37 @@ trait Uploadable
     use Resizable;
 
     /**
-     * @param string $field
+     * @param \Elegant\Foundation\Http\File\UploadedFile $file
      * @param string $slug
-     * @param array $row
      * @param string|null $oldFilePath
+     *
      * @return \Elegant\Support\Collection
      */
-    public function uploadFile(string $field, string $slug, array $row, string $oldFilePath = null): Collection
+    public function uploadFile(UploadedFile $file, string $slug, string $oldFilePath = null): Collection
     {
-        if (!$this->input->hasFile($field)) {
-            return collect([
-                'file_path' => $oldFilePath
-            ]);
-        }
-
-        $file = $this->input->file($field);
-
         $type = $this->checkExtension($file->getClientOriginalExtension());
 
-        return Uploader::upload($this->input, $field, $slug, $row, $oldFilePath, $type);
+        return Uploader::upload($file, $slug, $oldFilePath, $type);
+    }
+
+    /**
+     * @param array $files
+     * @param string $slug
+     * @param string|null $oldFilePath
+     *
+     * @return \Elegant\Support\Collection
+     */
+    public function uploadMultipleFile(array $files, string $slug, string $oldFilePath = null): Collection
+    {
+        $multipleFiles = collect();
+
+        foreach ($files as $file) {
+            $type = $this->checkExtension($file->getClientOriginalExtension());
+
+            $multipleFiles->push(Uploader::upload($file, $slug, $oldFilePath, $type));
+        }
+
+        return $multipleFiles;
     }
 
     /**

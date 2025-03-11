@@ -10,66 +10,39 @@ use Elegant\Support\Str;
 abstract class BaseType
 {
     /**
-     * @var \MY_Input
+     * @var \Elegant\Foundation\Http\File\UploadedFile $file
      */
-    protected \MY_Input $request;
+    protected UploadedFile $file;
 
     /**
-     * @var string
-     */
-    protected string $field;
-
-    /**
-     * @var string
+     * @var string $slug
      */
     protected string $slug;
 
     /**
-     * @var array
-     */
-    protected array $row;
-
-
-    /**
-     * @var ?string
+     * @var ?string $oldFilePath
      */
     protected ?string $oldFilePath;
 
     /**
-     * @var string
+     * @var string $type
      */
     protected string $type;
 
     /**
-     * @var array
-     */
-    protected array $config;
-
-    /**
      * BaseType constructor.
      *
-     * @param \MY_Input $request
-     * @param string $field
+     * @param \Elegant\Foundation\Http\File\UploadedFile $file
      * @param string $slug
-     * @param array $row
      * @param $oldFilePath
      * @param string $type
      */
-    public function __construct(\MY_Input $request, string $field, string $slug, array $row, $oldFilePath, string $type)
+    public function __construct(UploadedFile $file, string $slug, $oldFilePath, string $type)
     {
-        $this->request = $request;
-        $this->field = $field;
+        $this->file = $file;
         $this->slug = $slug;
-        $this->row = $row;
-        $this->oldFilePath = $oldFilePath;
+        $this->oldFilePath = $oldFilePath ?? null;
         $this->type = $type;
-        $this->config = [
-            'allowed_types' => config('media.settings.allowed_types'),
-            'max_size' => config('media.settings.max_size'),
-            'remove_spaces' => config('media.settings.remove_spaces'),
-            'encrypt_name' => config('media.settings.encrypt_name'),
-            'overwrite' => config('media.settings.overwrite')
-        ];
     }
 
     /**
@@ -113,6 +86,7 @@ abstract class BaseType
     /**
      * Delete old file if exist and its enable in config
      * @param $path
+     *
      * @return void
      */
     protected function deleteOldFile($path)

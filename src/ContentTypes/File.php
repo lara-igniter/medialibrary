@@ -3,43 +3,40 @@
 namespace Laraigniter\MediaLibrary\ContentTypes;
 
 use Elegant\Support\Collection;
+use Elegant\Support\Facades\Storage;
 
 class File extends BaseType
 {
     /**
-     * @return Collection
+     * @return \Elegant\Support\Collection
      */
     public function handle(): Collection
     {
-        $file = $this->request->file($this->field);
-
         $path = $this->slug . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('n') . DIRECTORY_SEPARATOR;
 
-        $filename = $this->generateFileName($file, $path);
+        if(!is_null($this->oldFilePath)) {
+            $this->deleteOldFile($this->oldFilePath);
+        }
 
-        $this->config = array_merge($this->config, [
-            'file_name' => $filename,
-            'upload_path' => storage_path('app/public/') . $path,
-        ]);
+        $filename = $this->generateFileName($this->file, $path);
 
-        app('load')->library('upload', $this->config);
+        $stored = Storage::disk(config('media.storage.disk'))->put(
+            $path . $filename . '.' . $this->file->getClientOriginalExtension(),
+            $this->file->getContent(),
+        );
 
-        $this->deleteOldFile($this->oldFilePath);
+        if ($stored) {
+            $fullPath = $path . $filename . '.' . $this->file->getClientOriginalExtension();
 
-        $data = collect();
-
-        if (app('upload')->do_upload($this->field)) {
-            $fullPath = $path . $filename . '.' . $file->getClientOriginalExtension();
-
-            $data = collect([
+            return new Collection([
                 'file_path' => $fullPath,
-                'file_name' => $file->getClientOriginalName(),
+                'file_name' => $this->file->getClientOriginalName(),
                 'file_type' => $this->type,
-                'file_extension' => $file->getClientOriginalExtension(),
-                'file_size' => $file->getSize(),
+                'file_extension' => $this->file->getClientOriginalExtension(),
+                'file_size' => $this->file->getSize(),
             ]);
         }
 
-        return $data;
+        return new Collection();
     }
 }
