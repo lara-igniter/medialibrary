@@ -87,7 +87,7 @@ trait Uploadable
      */
     public function restoreFile($model, string $field_name, int $id)
     {
-        $file = (new $model)->findOrFail($id);
+        $file = (new $model)->withTrashed()->findOrFail($id);
 
         if (Storage::disk(config('media.storage.temporary'))->exists('tmp/' . $file->{$field_name})) {
             $this->moveToPublic($file->{$field_name});
